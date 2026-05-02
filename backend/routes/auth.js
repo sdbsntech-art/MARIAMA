@@ -57,7 +57,10 @@ router.post('/register', async (req, res) => {
 
 router.post('/change-password', require('../middleware/auth'), async (req, res) => {
   try {
-    const { current_password, new_password } = req.body;
+    const { oldPassword, newPassword } = req.body;
+    const current_password = oldPassword;
+    const new_password = newPassword;
+
     if (!current_password || !new_password || new_password.length < 6)
       return res.status(400).json({ message: 'Données invalides (min 6 caractères)' });
 
