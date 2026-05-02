@@ -70,11 +70,12 @@ async function bootstrap() {
       )`
     ];
 
+    console.log(`✓ Tentative de connexion MySQL sur : ${process.env.DB_HOST || '127.0.0.1'}`);
     for (const sql of schemas) {
       await pool.query(sql);
     }
-
-    // Ajout d'un utilisateur admin par défaut si la table est vide
+    
+    // ... (le reste du code pour l'admin reste identique)
     const [rows] = await pool.query('SELECT COUNT(*) as count FROM users');
     if (rows[0].count === 0) {
       const bcrypt = require('bcryptjs');
@@ -85,7 +86,8 @@ async function bootstrap() {
     
     console.log('✓ Base de données MySQL prête →', process.env.DB_NAME || 'soutenance_db');
   } catch (err) {
-    console.error('❌ Erreur DB MySQL (Vérifiez que Laragon/MySQL est lancé):', err.message);
+    console.error('❌ Erreur de connexion MySQL :', err.message);
+    console.error('Hôte utilisé :', process.env.DB_HOST || '127.0.0.1');
     process.exit(1);
   }
 }
