@@ -4,12 +4,22 @@
 
 const mysql = require('mysql2/promise');
 
-const pool = mysql.createPool({
+console.log('--- DIAGNOSTIC DES VARIABLES ---');
+console.log('MYSQLHOST:', process.env.MYSQLHOST);
+console.log('DB_HOST:', process.env.DB_HOST);
+console.log('MYSQLUSER:', process.env.MYSQLUSER);
+console.log('DB_USER:', process.env.DB_USER);
+
+const dbConfig = {
   host:     process.env.MYSQLHOST || process.env.DB_HOST || '127.0.0.1',
   user:     process.env.MYSQLUSER || process.env.DB_USER || 'root',
   password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || process.env.DB_PASS || '',
   database: process.env.MYSQLDATABASE || process.env.DB_NAME || 'soutenance_db',
   port:     process.env.MYSQLPORT || process.env.DB_PORT || 3306,
+};
+
+const pool = mysql.createPool({
+  ...dbConfig,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
@@ -72,8 +82,8 @@ async function bootstrap() {
     ];
 
     console.log("--- CONFIGURATION BASE DE DONNÉES ---");
-    console.log(`Hôte : ${process.env.MYSQLHOST || process.env.DB_HOST || '127.0.0.1'}`);
-    console.log(`Base : ${process.env.MYSQLDATABASE || process.env.DB_NAME || 'soutenance_db'}`);
+    console.log(`Hôte utilisé : ${dbConfig.host}`);
+    console.log(`Base de données : ${dbConfig.database}`);
     
     for (const sql of schemas) {
       await pool.query(sql);
@@ -88,10 +98,10 @@ async function bootstrap() {
       console.log('✓ Utilisateur admin par défaut créé (admin / admin123)');
     }
     
-    console.log('✓ Base de données MySQL prête →', process.env.DB_NAME || 'soutenance_db');
+    console.log('✓ Base de données MySQL prête →', dbConfig.database);
   } catch (err) {
     console.error('❌ Erreur de connexion MySQL :', err.message);
-    console.error('Hôte utilisé :', process.env.DB_HOST || '127.0.0.1');
+    console.error('Hôte réellement utilisé :', dbConfig.host);
     process.exit(1);
   }
 }
