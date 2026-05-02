@@ -70,6 +70,8 @@ async function bootstrap() {
       )`
     ];
 
+    console.log("--- DIAGNOSTIC DES VARIABLES ---");
+    console.log("Variables détectées :", Object.keys(process.env).filter(k => k.startsWith('DB_') || k.startsWith('MYSQL')));
     console.log(`✓ Tentative de connexion MySQL sur : ${process.env.DB_HOST || '127.0.0.1'}`);
     for (const sql of schemas) {
       await pool.query(sql);
