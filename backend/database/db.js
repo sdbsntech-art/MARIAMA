@@ -104,8 +104,10 @@ async function bootstrap() {
     
     console.log('✅ Base de données opérationnelle');
   } catch (err) {
-    console.error('❌ Erreur de connexion MySQL :', err.message);
-    console.error('Hôte tenté :', dbHost);
+    console.error('❌ ERREUR DÉTAILLÉE :');
+    console.error(err); // Affiche l'objet erreur complet
+    console.error('Message :', err.message);
+    console.error('Code :', err.code);
     process.exit(1);
   }
 }
