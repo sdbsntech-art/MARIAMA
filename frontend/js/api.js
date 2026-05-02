@@ -35,6 +35,10 @@ const Api = (() => {
     return await http('POST', '/auth/register', { username, password });
   }
 
+  async function changePassword(oldPassword, newPassword) {
+    return await http('POST', '/auth/change-password', { oldPassword, newPassword });
+  }
+
   function logout() { localStorage.clear(); location.href = '/index.html'; }
   function isAuthenticated() { return !!getToken(); }
 
@@ -74,7 +78,7 @@ const Api = (() => {
     a.click();
   }
 
-  return { login, register, logout, isAuthenticated, getToken, getUser, etudiants, encadreurs, soutenances, stats, exportCSV };
+  return { login, register, changePassword, logout, isAuthenticated, getToken, getUser, etudiants, encadreurs, soutenances, stats, exportCSV };
 })();
 
 if (document.querySelector('.app-page') && !Api.isAuthenticated()) location.href = '/index.html';

@@ -148,6 +148,31 @@ document.getElementById('btn-export')?.addEventListener('click', () => {
     .catch(err => showToast(err.message, 'error'));
 });
 
+/* ── SETTINGS: CHANGE PASSWORD ── */
+document.getElementById('btn-settings')?.addEventListener('click', () => {
+  openModal('modal-password');
+});
+
+document.getElementById('form-password')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const current  = document.getElementById('pwd-current').value;
+  const newPwd   = document.getElementById('pwd-new').value;
+  const confirmP = document.getElementById('pwd-confirm').value;
+
+  if (newPwd !== confirmP) {
+    return showToast('Les nouveaux mots de passe ne correspondent pas.', 'error');
+  }
+
+  try {
+    await Api.changePassword(current, newPwd);
+    showToast('Mot de passe mis à jour avec succès !', 'success');
+    closeModal('modal-password');
+    e.target.reset();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+});
+
 /* ── Confirm Delete helper ── */
 async function confirmDelete(msg = 'Supprimer cet élément ?') {
   return confirm(msg);
