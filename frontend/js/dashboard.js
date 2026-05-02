@@ -2,10 +2,7 @@
 
 async function loadDashboard() {
   try {
-    const [stats, activity] = await Promise.all([
-      Api.stats.getDashboard(),
-      Api.stats.getActivity(),
-    ]);
+    const stats = await Api.stats.getDashboard();
 
     // Stats
     animateNumber('stat-etudiants', stats.total_etudiants);
@@ -19,8 +16,6 @@ async function loadDashboard() {
     // Filière chart
     renderFiliereChart(stats.par_filiere || []);
 
-    // Activity
-    renderActivity(activity || []);
 
     // Notifications (Rappels)
     const badgeTop = document.getElementById('notif-badge');
@@ -167,30 +162,7 @@ function renderFiliereChart(data) {
   legend.appendChild(legendDiv);
 }
 
-function renderActivity(items) {
-  const container = document.getElementById('activity-log');
-  if (!container) return;
-  if (!items.length) {
-    container.innerHTML = '<p style="color:var(--text-muted);font-size:13px;padding:8px 0">Aucune activité récente</p>';
-    return;
-  }
-  container.innerHTML = items.slice(0, 8).map(a => `
-    <div class="activity-item" style="display:flex; gap:12px; align-items:center; padding: 8px 0; border-bottom: 1px solid var(--border);">
-      <span class="activity-dot ${a.type || 'add'}" style="width:8px; height:8px; border-radius:50%; background:var(--ucad-blue); flex-shrink:0;"></span>
-      <span class="activity-text" style="font-size:13px; color:var(--text); flex:1;">${escHtml(a.message)}</span>
-      <span class="activity-time" style="font-size:11px; color:var(--text-faint);">${formatRelativeTime(a.created_at)}</span>
-    </div>`).join('');
-}
 
-function formatRelativeTime(iso) {
-  const d = new Date(iso);
-  const now = new Date();
-  const diff = Math.floor((now - d) / 1000);
-  if (diff < 60) return 'À l\'instant';
-  if (diff < 3600) return `${Math.floor(diff/60)} min`;
-  if (diff < 86400) return `${Math.floor(diff/3600)} h`;
-  return d.toLocaleDateString('fr');
-}
 
 function escHtml(str) {
   return String(str || '').replace(/[&<>"']/g, c => ({
