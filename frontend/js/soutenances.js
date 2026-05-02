@@ -24,21 +24,21 @@ function renderSoutenancesTable(data) {
     const statusMap = { planifie:'Planifiée', en_cours:'En cours', termine:'Terminée', reporte:'Reportée' };
     return `
       <tr>
-        <td>
+        <td data-label="Étudiant">
           <div style="font-weight:600">${escHtml(s.etudiant_nom || '—')}</div>
           <div style="font-size:11px;color:var(--text-faint)">${escHtml(s.filiere || '')}</div>
         </td>
-        <td style="max-width:200px">
+        <td data-label="Sujet" style="max-width:200px">
           <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${escHtml(s.sujet||'')}">
             ${escHtml(s.sujet || '—')}
           </div>
         </td>
-        <td>${dateStr}</td>
-        <td><strong>${escHtml(s.heure || '—')}</strong></td>
-        <td>${escHtml(s.salle || '—')}</td>
-        <td style="color:var(--text-muted);font-size:12px">${escHtml(s.jury || '—')}</td>
-        <td><span class="badge badge-${s.statut || 'planifie'}">${statusMap[s.statut] || s.statut}</span></td>
-        <td>
+        <td data-label="Date">${dateStr}</td>
+        <td data-label="Heure"><strong>${escHtml(s.heure || '—')}</strong></td>
+        <td data-label="Salle">${escHtml(s.salle || '—')}</td>
+        <td data-label="Jury" style="color:var(--text-muted);font-size:12px">${escHtml(s.jury || '—')}</td>
+        <td data-label="Statut"><span class="badge badge-${s.statut || 'planifie'}">${statusMap[s.statut] || s.statut}</span></td>
+        <td data-label="Actions">
           <div class="table-actions">
             <button class="table-btn edit" onclick="editSoutenance(${s.id})" title="Modifier">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -270,14 +270,14 @@ function renderNotesTable(data) {
     const mention = moy ? getMention(parseFloat(moy)) : null;
     return `
       <tr>
-        <td><strong>${escHtml(s.etudiant_nom || '—')}</strong></td>
-        <td><span class="badge badge-planifie">${escHtml(s.filiere||'—')}</span></td>
-        <td style="font-size:12px;color:var(--text-muted);max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(s.sujet||'—')}</td>
-        <td>${hasNotes ? `<strong>${parseFloat(s.note_memoire).toFixed(2)}</strong>` : '<span style="color:var(--text-faint)">—</span>'}</td>
-        <td>${hasNotes ? `<strong>${parseFloat(s.note_oral).toFixed(2)}</strong>` : '<span style="color:var(--text-faint)">—</span>'}</td>
-        <td>${moy ? `<span style="font-size:16px;font-weight:700;font-family:var(--font-display);color:var(--gold)">${moy}</span>` : '—'}</td>
-        <td>${mention ? `<span class="badge ${mention.cls}">${mention.label}</span>` : '—'}</td>
-        <td>
+        <td data-label="Étudiant"><strong>${escHtml(s.etudiant_nom || '—')}</strong></td>
+        <td data-label="Filière"><span class="badge badge-planifie">${escHtml(s.filiere||'—')}</span></td>
+        <td data-label="Sujet" style="font-size:12px;color:var(--text-muted);max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(s.sujet||'—')}</td>
+        <td data-label="Note Mémoire">${hasNotes ? `<strong>${parseFloat(s.note_memoire).toFixed(2)}</strong>` : '<span style="color:var(--text-faint)">—</span>'}</td>
+        <td data-label="Note Oral">${hasNotes ? `<strong>${parseFloat(s.note_oral).toFixed(2)}</strong>` : '<span style="color:var(--text-faint)">—</span>'}</td>
+        <td data-label="Moyenne">${moy ? `<span style="font-size:16px;font-weight:700;font-family:var(--font-display);color:var(--gold)">${moy}</span>` : '—'}</td>
+        <td data-label="Mention">${mention ? `<span class="badge ${mention.cls}">${mention.label}</span>` : '—'}</td>
+        <td data-label="Action">
           <button class="table-btn edit" onclick="openNotesModal(${s.id},'${escHtml(s.etudiant_nom||'')}')" title="Saisir notes">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           </button>

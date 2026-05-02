@@ -33,19 +33,19 @@ function renderEtudiantsTable(data) {
 
   tbody.innerHTML = slice.map(e => `
     <tr>
-      <td>
+      <td data-label="Nom complet">
         <div style="font-weight:600">${escHtml(e.prenom)} ${escHtml(e.nom)}</div>
         <div style="font-size:11px;color:var(--text-faint)">${escHtml(e.email || '')}</div>
       </td>
-      <td><span class="badge badge-planifie">${escHtml(e.filiere)}</span></td>
-      <td style="max-width:240px">
+      <td data-label="Filière"><span class="badge badge-planifie">${escHtml(e.filiere)}</span></td>
+      <td data-label="Sujet" style="max-width:240px">
         <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${escHtml(e.sujet)}">
           ${escHtml(e.sujet)}
         </div>
       </td>
-      <td>${escHtml(e.encadreur_nom || '—')}</td>
-      <td><span class="badge ${e.soutenance_id ? 'badge-termine' : 'badge-reporte'}">${e.soutenance_id ? 'Planifié' : 'En attente'}</span></td>
-      <td>
+      <td data-label="Encadreur">${escHtml(e.encadreur_nom || '—')}</td>
+      <td data-label="Statut"><span class="badge ${e.soutenance_id ? 'badge-termine' : 'badge-reporte'}">${e.soutenance_id ? 'Planifié' : 'En attente'}</span></td>
+      <td data-label="Actions">
         <div class="table-actions">
           <button class="table-btn edit" onclick="editEtudiant(${e.id})" title="Modifier">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>

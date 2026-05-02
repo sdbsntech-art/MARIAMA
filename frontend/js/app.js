@@ -1,3 +1,15 @@
+/* ── UTILS ── */
+function escHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+window.escHtml = escHtml;
+
 /* ============================================================
    app.js — Core: navigation, toasts, modals, layout
    ============================================================ */

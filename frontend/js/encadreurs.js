@@ -20,17 +20,17 @@ function renderEncadreursTable(data) {
   }
   tbody.innerHTML = data.map(enc => `
     <tr>
-      <td>
+      <td data-label="Nom complet">
         <div style="font-weight:600">${escHtml(enc.prenom)} ${escHtml(enc.nom)}</div>
       </td>
-      <td><span class="badge badge-en_cours">${escHtml(enc.grade || '—')}</span></td>
-      <td>${escHtml(enc.departement || '—')}</td>
-      <td style="color:var(--text-muted)">${escHtml(enc.email || '—')}</td>
-      <td>
+      <td data-label="Grade"><span class="badge badge-en_cours">${escHtml(enc.grade || '—')}</span></td>
+      <td data-label="Département">${escHtml(enc.departement || '—')}</td>
+      <td data-label="Email" style="color:var(--text-muted)">${escHtml(enc.email || '—')}</td>
+      <td data-label="Encadrés">
         <span style="font-weight:600;color:var(--gold)">${enc.nb_etudiants || 0}</span>
         <span style="color:var(--text-faint)"> étudiant(s)</span>
       </td>
-      <td>
+      <td data-label="Actions">
         <div class="table-actions">
           <button class="table-btn edit" onclick="editEncadreur(${enc.id})" title="Modifier">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>

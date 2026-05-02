@@ -340,15 +340,16 @@
     display: flex;
   }
   .topbar { padding-left: 68px; }
-  .pages-container { padding: 20px 16px; }
+  .pages-container { padding: 16px 12px; }
 }
 
 @media (max-width: 640px) {
   .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
   .stat-value { font-size: 26px; }
   .page-toolbar { gap: 8px; }
-  .topbar { padding-left: 60px; padding-right: 16px; }
-  .topbar-title h1 { font-size: 18px; }
+  .topbar { padding-left: 60px; padding-right: 16px; gap: 8px; }
+  .topbar-title h1 { font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; }
+  .topbar-title p { font-size: 10px; display: none; } /* On cache le sous-titre sur tout petit écran */
   .data-table th, .data-table td { padding: 10px 12px; }
 }
 
