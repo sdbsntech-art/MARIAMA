@@ -4,12 +4,6 @@
 
 const mysql = require('mysql2/promise');
 
-console.log('--- DIAGNOSTIC DES VARIABLES ---');
-console.log('MYSQLHOST:', process.env.MYSQLHOST);
-console.log('DB_HOST:', process.env.DB_HOST);
-console.log('MYSQLUSER:', process.env.MYSQLUSER);
-console.log('DB_USER:', process.env.DB_USER);
-
 const dbConfig = {
   host:     process.env.MYSQLHOST || process.env.DB_HOST || '127.0.0.1',
   user:     process.env.MYSQLUSER || process.env.DB_USER || 'root',
@@ -81,27 +75,27 @@ async function bootstrap() {
       )`
     ];
 
-    console.log("--- CONFIGURATION BASE DE DONNÉES ---");
-    console.log(`Hôte utilisé : ${dbConfig.host}`);
-    console.log(`Base de données : ${dbConfig.database}`);
+    console.log("--- CONNEXION BASE DE DONNÉES ---");
+    console.log(`Hôte : ${dbConfig.host}`);
+    console.log(`Base : ${dbConfig.database}`);
+    console.log(`Utilisateur : ${dbConfig.user}`);
     
     for (const sql of schemas) {
       await pool.query(sql);
     }
     
-    // ... (le reste du code pour l'admin reste identique)
     const [rows] = await pool.query('SELECT COUNT(*) as count FROM users');
     if (rows[0].count === 0) {
       const bcrypt = require('bcryptjs');
       const hash = bcrypt.hashSync('admin123', 12);
       await pool.query('INSERT INTO users (username, password, role) VALUES (?, ?, ?)', ['admin', hash, 'admin']);
-      console.log('✓ Utilisateur admin par défaut créé (admin / admin123)');
+      console.log('✓ Admin par défaut créé : admin / admin123');
     }
     
-    console.log('✓ Base de données MySQL prête →', dbConfig.database);
+    console.log('✅ Base de données opérationnelle');
   } catch (err) {
     console.error('❌ Erreur de connexion MySQL :', err.message);
-    console.error('Hôte réellement utilisé :', dbConfig.host);
+    console.error('Hôte tenté :', dbConfig.host);
     process.exit(1);
   }
 }
