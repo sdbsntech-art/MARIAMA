@@ -4,20 +4,31 @@
 
 const mysql = require('mysql2/promise');
 
-const dbConfig = {
-  host:     process.env.MYSQLHOST || process.env.DB_HOST || '127.0.0.1',
-  user:     process.env.MYSQLUSER || process.env.DB_USER || 'root',
-  password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || process.env.DB_PASS || '',
-  database: process.env.MYSQLDATABASE || process.env.DB_NAME || 'soutenance_db',
-  port:     process.env.MYSQLPORT || process.env.DB_PORT || 3306,
-};
+let pool;
+const dbUrl = process.env.DATABASE_URL || process.env.MYSQL_URL;
 
-const pool = mysql.createPool({
-  ...dbConfig,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
-});
+if (dbUrl) {
+  console.log("--- CONNEXION VIA URL DÉTECTÉE ---");
+  pool = mysql.createPool(dbUrl);
+} else {
+  const dbConfig = {
+    host:     process.env.MYSQLHOST || process.env.DB_HOST || '127.0.0.1',
+    user:     process.env.MYSQLUSER || process.env.DB_USER || 'root',
+    password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || process.env.DB_PASS || '',
+    database: process.env.MYSQLDATABASE || process.env.DB_NAME || 'soutenance_db',
+    port:     process.env.MYSQLPORT || process.env.DB_PORT || 3306,
+  };
+  pool = mysql.createPool({
+    ...dbConfig,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+  });
+}
+
+// On garde une référence pour le bootstrap
+const dbHost = dbUrl ? 'URL Railway' : (process.env.MYSQLHOST || process.env.DB_HOST || '127.0.0.1');
+const dbName = dbUrl ? 'Base Railway' : (process.env.MYSQLDATABASE || process.env.DB_NAME || 'soutenance_db');
 
 async function bootstrap() {
   try {
@@ -76,9 +87,8 @@ async function bootstrap() {
     ];
 
     console.log("--- CONNEXION BASE DE DONNÉES ---");
-    console.log(`Hôte : ${dbConfig.host}`);
-    console.log(`Base : ${dbConfig.database}`);
-    console.log(`Utilisateur : ${dbConfig.user}`);
+    console.log(`Hôte : ${dbHost}`);
+    console.log(`Base : ${dbName}`);
     
     for (const sql of schemas) {
       await pool.query(sql);
@@ -95,7 +105,7 @@ async function bootstrap() {
     console.log('✅ Base de données opérationnelle');
   } catch (err) {
     console.error('❌ Erreur de connexion MySQL :', err.message);
-    console.error('Hôte tenté :', dbConfig.host);
+    console.error('Hôte tenté :', dbHost);
     process.exit(1);
   }
 }
