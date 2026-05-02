@@ -9,6 +9,7 @@ const path      = require('path');
 require('./database/db'); // init DB
 
 const app  = express();
+app.set('trust proxy', 1); // Indispensable sur Railway
 const PORT = process.env.PORT || 3000;
 
 app.use(helmet({ contentSecurityPolicy: false }));
