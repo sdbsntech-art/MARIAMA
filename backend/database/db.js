@@ -73,6 +73,15 @@ async function bootstrap() {
     for (const sql of schemas) {
       await pool.query(sql);
     }
+
+    // Ajout d'un utilisateur admin par défaut si la table est vide
+    const [rows] = await pool.query('SELECT COUNT(*) as count FROM users');
+    if (rows[0].count === 0) {
+      const bcrypt = require('bcryptjs');
+      const hash = bcrypt.hashSync('admin123', 12);
+      await pool.query('INSERT INTO users (username, password, role) VALUES (?, ?, ?)', ['admin', hash, 'admin']);
+      console.log('✓ Utilisateur admin par défaut créé (admin / admin123)');
+    }
     
     console.log('✓ Base de données MySQL prête →', process.env.DB_NAME || 'soutenance_db');
   } catch (err) {
