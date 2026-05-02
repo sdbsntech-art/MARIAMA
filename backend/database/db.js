@@ -5,10 +5,11 @@
 const mysql = require('mysql2/promise');
 
 const pool = mysql.createPool({
-  host: process.env.DB_HOST || '127.0.0.1',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || process.env.DB_PASS || '',
-  database: process.env.DB_NAME || 'soutenance_db',
+  host:     process.env.MYSQLHOST || process.env.DB_HOST || '127.0.0.1',
+  user:     process.env.MYSQLUSER || process.env.DB_USER || 'root',
+  password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || process.env.DB_PASS || '',
+  database: process.env.MYSQLDATABASE || process.env.DB_NAME || 'soutenance_db',
+  port:     process.env.MYSQLPORT || process.env.DB_PORT || 3306,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
@@ -70,9 +71,10 @@ async function bootstrap() {
       )`
     ];
 
-    console.log("--- DIAGNOSTIC DES VARIABLES ---");
-    console.log("Variables détectées :", Object.keys(process.env).filter(k => k.startsWith('DB_') || k.startsWith('MYSQL')));
-    console.log(`✓ Tentative de connexion MySQL sur : ${process.env.DB_HOST || '127.0.0.1'}`);
+    console.log("--- CONFIGURATION BASE DE DONNÉES ---");
+    console.log(`Hôte : ${process.env.MYSQLHOST || process.env.DB_HOST || '127.0.0.1'}`);
+    console.log(`Base : ${process.env.MYSQLDATABASE || process.env.DB_NAME || 'soutenance_db'}`);
+    
     for (const sql of schemas) {
       await pool.query(sql);
     }
