@@ -1,6 +1,6 @@
 /* api.js — Tout passe par Node.js :3000 uniquement */
 
-const API = 'http://localhost:3000/api';
+const API = window.location.origin + '/api';
 
 const Api = (() => {
   const getToken  = () => localStorage.getItem('token');
