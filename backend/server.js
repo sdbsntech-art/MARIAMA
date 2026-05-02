@@ -40,7 +40,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: err.message });
 });
 
-app.listen(PORT, () => {
-  console.log(`\n🎓 SoutenancePro → http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`\n🎓 SoutenancePro opérationnel sur le port ${PORT}`);
   console.log(`   Login : admin / admin123\n`);
 });
