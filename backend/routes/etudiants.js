@@ -51,7 +51,7 @@ router.get('/:id', async (req, res) => {
 });
 
 /* POST create */
-router.post('/', isAdmin, async (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const { prenom, nom, email, filiere, numero, sujet, encadreur_id } = req.body;
     if (!prenom || !nom || !filiere || !sujet)

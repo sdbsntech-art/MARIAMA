@@ -30,7 +30,7 @@ if (user) {
     // On cache les boutons d'action
     const style = document.createElement('style');
     style.innerHTML = `
-      .role-user .btn-primary, 
+      .role-user .btn-primary:not(#btn-add-etudiant), 
       .role-user .btn-sm, 
       .role-user #btn-export,
       .role-user .table-actions,

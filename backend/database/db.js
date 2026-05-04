@@ -94,22 +94,22 @@ async function bootstrap() {
       await pool.query(sql);
     }
     
-    const [rows] = await pool.query('SELECT COUNT(*) as count FROM users');
-    if (rows[0].count === 0) {
-      const bcrypt = require('bcryptjs');
-      const hash = bcrypt.hashSync('admin@@123', 12);
+    const [adminRows] = await pool.query('SELECT id FROM users WHERE username = "admin"');
+    const bcrypt = require('bcryptjs');
+    const hash = bcrypt.hashSync('admin@@123', 12);
+
+    if (adminRows.length === 0) {
       await pool.query('INSERT INTO users (username, password, role) VALUES (?, ?, ?)', ['admin', hash, 'admin']);
-      console.log('✓ Admin par défaut créé : admin / admin@@123');
+      console.log('✓ Admin recréé : admin / admin@@123');
     } else {
-      // Sécurité : S'assurer que seul 'admin' est administrateur
-      const bcrypt = require('bcryptjs');
-      const hash = bcrypt.hashSync('admin@@123', 12);
-      // On met à jour l'admin s'il existe
+      // S'assurer que les droits et le mot de passe sont corrects
       await pool.query('UPDATE users SET role = "admin", password = ? WHERE username = "admin"', [hash]);
-      // On rétrograde tous les autres
-      await pool.query('UPDATE users SET role = "user" WHERE username != "admin"');
-      console.log('✓ Droits admin restreints au compte "admin" uniquement');
+      console.log('✓ Compte admin mis à jour');
     }
+
+    // On rétrograde tous les autres pour la sécurité
+    await pool.query('UPDATE users SET role = "user" WHERE username != "admin"');
+    console.log('✓ Droits admin restreints au compte "admin" uniquement');
     
     console.log('✅ Base de données opérationnelle');
   } catch (err) {
