@@ -43,5 +43,5 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`\n🎓 SoutenancePro opérationnel sur le port ${PORT}`);
-  console.log(`   Login : admin / admin123\n`);
+  console.log(`   Login : admin / admin@@123\n`);
 });

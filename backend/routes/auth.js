@@ -39,12 +39,15 @@ router.post('/register', async (req, res) => {
     if (!username || !password || password.length < 6)
       return res.status(400).json({ message: 'Identifiant et mot de passe (min 6 caractères) requis' });
 
+    if (username.trim().toLowerCase() === 'admin')
+      return res.status(400).json({ message: 'Ce nom d\'utilisateur est réservé' });
+
     const [existing] = await db.execute('SELECT id FROM users WHERE username = ?', [username.trim()]);
     if (existing.length > 0)
       return res.status(400).json({ message: 'Ce nom d\'utilisateur existe déjà' });
 
     const hash = bcrypt.hashSync(password, 12);
-    const [result] = await db.execute('INSERT INTO users (username, password, role) VALUES (?, ?, ?)', [username.trim(), hash, 'admin']);
+    const [result] = await db.execute('INSERT INTO users (username, password, role) VALUES (?, ?, ?)', [username.trim(), hash, 'user']);
 
     await db.execute("INSERT INTO activity_log (type, message, user_id) VALUES ('add',?,?)", [`Inscription de ${username.trim()}`, result.insertId]);
 

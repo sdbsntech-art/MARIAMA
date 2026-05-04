@@ -2,6 +2,7 @@
 const router = require('express').Router();
 const db     = require('../database/db');
 const emailService = require('../utils/emailService');
+const isAdmin = require('../middleware/isAdmin');
 
 const log = async (type, msg, userId) => {
   try {
@@ -50,7 +51,7 @@ router.get('/:id', async (req, res) => {
 });
 
 /* POST create */
-router.post('/', async (req, res) => {
+router.post('/', isAdmin, async (req, res) => {
   try {
     const { prenom, nom, email, filiere, numero, sujet, encadreur_id } = req.body;
     if (!prenom || !nom || !filiere || !sujet)
@@ -89,11 +90,18 @@ router.post('/', async (req, res) => {
 });
 
 /* PUT update */
-router.put('/:id', async (req, res) => {
+router.put('/:id', isAdmin, async (req, res) => {
   try {
     const { prenom, nom, email, filiere, numero, sujet, encadreur_id } = req.body;
     const [rows] = await db.execute('SELECT id FROM etudiants WHERE id = ?', [req.params.id]);
     if (rows.length === 0) return res.status(404).json({ message: 'Étudiant introuvable' });
+
+    // Vérifier si l'encadreur a changé pour envoyer une notification
+    let oldEncadreurId = null;
+    try {
+      const [oldRows] = await db.execute('SELECT encadreur_id FROM etudiants WHERE id = ?', [req.params.id]);
+      oldEncadreurId = oldRows[0]?.encadreur_id;
+    } catch (err) { console.error(err); }
 
     await db.execute(`
       UPDATE etudiants SET prenom=?,nom=?,email=?,filiere=?,numero=?,sujet=?,encadreur_id=?
@@ -101,11 +109,7 @@ router.put('/:id', async (req, res) => {
 
     await log('edit', `Étudiant ${prenom} ${nom} modifié`, req.user?.id);
 
-    // Vérifier si l'encadreur a changé pour envoyer une notification
     try {
-      const [oldRows] = await db.execute('SELECT encadreur_id FROM etudiants WHERE id = ?', [req.params.id]);
-      const oldEncadreurId = oldRows[0]?.encadreur_id;
-
       if (encadreur_id && encadreur_id != oldEncadreurId) {
         const [encRows] = await db.execute('SELECT * FROM encadreurs WHERE id = ?', [encadreur_id]);
         if (encRows.length > 0 && encRows[0].email) {
@@ -124,7 +128,7 @@ router.put('/:id', async (req, res) => {
 });
 
 /* DELETE */
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', isAdmin, async (req, res) => {
   try {
     const [rows] = await db.execute('SELECT * FROM etudiants WHERE id = ?', [req.params.id]);
     const e = rows[0];

@@ -18,9 +18,26 @@ window.escHtml = escHtml;
 const user = Api.getUser();
 if (user) {
   const el = document.getElementById('sidebar-username');
+  const roleEl = document.querySelector('.user-role');
   const av = document.getElementById('user-avatar');
-  if (el) el.textContent = user.username || 'Admin';
-  if (av) av.textContent = (user.username || 'A')[0].toUpperCase();
+  if (el) el.textContent = user.username || 'Utilisateur';
+  if (roleEl) roleEl.textContent = user.role === 'admin' ? 'Administrateur' : 'Utilisateur';
+  if (av) av.textContent = (user.username || 'U')[0].toUpperCase();
+
+  // Restriction UI pour les non-admins
+  if (user.role !== 'admin') {
+    document.body.classList.add('role-user');
+    // On cache les boutons d'action
+    const style = document.createElement('style');
+    style.innerHTML = `
+      .role-user .btn-primary, 
+      .role-user .btn-sm, 
+      .role-user #btn-export,
+      .role-user .table-actions,
+      .role-user .table-btn { display: none !important; }
+    `;
+    document.head.appendChild(style);
+  }
 }
 
 /* ── LOGOUT ── */

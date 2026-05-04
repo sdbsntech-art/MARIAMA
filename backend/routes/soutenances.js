@@ -1,6 +1,8 @@
 /* routes/soutenances.js */
 const router = require('express').Router();
 const db     = require('../database/db');
+const emailService = require('../utils/emailService');
+const isAdmin = require('../middleware/isAdmin');
 
 const log = async (type, msg, uid) => {
   try {
@@ -68,7 +70,7 @@ router.get('/:id', async (req, res) => {
 });
 
 /* POST create */
-router.post('/', async (req, res) => {
+router.post('/', isAdmin, async (req, res) => {
   try {
     const { etudiant_id, date, heure, salle, duree, jury, statut } = req.body;
     if (!etudiant_id || !date || !heure || !salle)
@@ -84,6 +86,24 @@ router.post('/', async (req, res) => {
 
     const [r] = await db.execute('INSERT INTO soutenances(etudiant_id,date,heure,salle,duree,jury,statut) VALUES(?,?,?,?,?,?,?)', [etudiant_id, date, heure, salle, duree||60, jury||null, statut||'planifie']);
     await log('add', `Soutenance planifiée pour ${etudiant.prenom} ${etudiant.nom} le ${date}`, req.user?.id);
+
+    // Envoi notification
+    try {
+      const [fullData] = await db.execute(`
+        SELECT e.*, enc.prenom as enc_prenom, enc.nom as enc_nom, enc.email as enc_email
+        FROM etudiants e
+        LEFT JOIN encadreurs enc ON enc.id = e.encadreur_id
+        WHERE e.id = ?`, [etudiant_id]);
+      
+      const sData = fullData[0];
+      if (sData && sData.email) {
+        const supervisor = sData.encadreur_id ? { prenom: sData.enc_prenom, nom: sData.enc_nom, email: sData.enc_email } : null;
+        await emailService.sendDefenseScheduledEmail(sData, supervisor, { date, heure, salle, jury });
+      }
+    } catch (mailErr) {
+      console.error('Erreur mail planification:', mailErr);
+    }
+
     res.status(201).json({ id: r.insertId, message: 'Soutenance planifiée' });
   } catch (err) {
     console.error(err);
@@ -92,7 +112,7 @@ router.post('/', async (req, res) => {
 });
 
 /* PUT update */
-router.put('/:id', async (req, res) => {
+router.put('/:id', isAdmin, async (req, res) => {
   try {
     const { etudiant_id, date, heure, salle, duree, jury, statut } = req.body;
     const [rows] = await db.execute('SELECT * FROM soutenances WHERE id=?', [req.params.id]);
@@ -105,6 +125,27 @@ router.put('/:id', async (req, res) => {
 
     await db.execute("UPDATE soutenances SET etudiant_id=?,date=?,heure=?,salle=?,duree=?,jury=?,statut=? WHERE id=?", [etudiant_id||s.etudiant_id, date, heure, salle, duree||60, jury||null, statut||'planifie', req.params.id]);
     await log('edit', `Soutenance #${req.params.id} mise à jour`, req.user?.id);
+
+    // Envoi notification si la date/heure/salle a changé
+    try {
+      if (date !== s.date || heure !== s.heure || salle !== s.salle) {
+        const eid = etudiant_id || s.etudiant_id;
+        const [fullData] = await db.execute(`
+          SELECT e.*, enc.prenom as enc_prenom, enc.nom as enc_nom, enc.email as enc_email
+          FROM etudiants e
+          LEFT JOIN encadreurs enc ON enc.id = e.encadreur_id
+          WHERE e.id = ?`, [eid]);
+        
+        const sData = fullData[0];
+        if (sData && sData.email) {
+          const supervisor = sData.encadreur_id ? { prenom: sData.enc_prenom, nom: sData.enc_nom, email: sData.enc_email } : null;
+          await emailService.sendDefenseScheduledEmail(sData, supervisor, { date, heure, salle, jury });
+        }
+      }
+    } catch (mailErr) {
+      console.error('Erreur mail mise à jour planification:', mailErr);
+    }
+
     res.json({ message: 'Soutenance mise à jour' });
   } catch (err) {
     console.error(err);
@@ -113,7 +154,7 @@ router.put('/:id', async (req, res) => {
 });
 
 /* PUT notes */
-router.put('/:id/notes', async (req, res) => {
+router.put('/:id/notes', isAdmin, async (req, res) => {
   try {
     const { note_memoire, note_oral, appreciation } = req.body;
     if (note_memoire == null || note_oral == null)
@@ -136,7 +177,7 @@ router.put('/:id/notes', async (req, res) => {
 });
 
 /* DELETE */
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', isAdmin, async (req, res) => {
   try {
     const [rows] = await db.execute("SELECT s.*, CONCAT(e.prenom, ' ', e.nom) AS nom FROM soutenances s JOIN etudiants e ON e.id=s.etudiant_id WHERE s.id=?", [req.params.id]);
     const s = rows[0];

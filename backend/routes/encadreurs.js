@@ -3,6 +3,7 @@
    ============================================================ */
 const router = require('express').Router();
 const db     = require('../database/db');
+const isAdmin = require('../middleware/isAdmin');
 
 const log = async (type, msg, uid) => {
   try {
@@ -40,7 +41,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', isAdmin, async (req, res) => {
   try {
     const { prenom, nom, email, grade, departement } = req.body;
     if (!prenom || !nom) return res.status(400).json({ message: 'Prénom et nom requis' });
@@ -53,7 +54,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', isAdmin, async (req, res) => {
   try {
     const { prenom, nom, email, grade, departement } = req.body;
     const [rows] = await db.execute('SELECT id FROM encadreurs WHERE id = ?', [req.params.id]);
@@ -67,7 +68,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', isAdmin, async (req, res) => {
   try {
     const [rows] = await db.execute('SELECT * FROM encadreurs WHERE id = ?', [req.params.id]);
     const e = rows[0];

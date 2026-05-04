@@ -107,7 +107,43 @@ const sendSupervisorAssignmentEmail = async (supervisor, student) => {
   });
 };
 
+/**
+ * Envoie un mail de notification de planification de soutenance
+ */
+const sendDefenseScheduledEmail = async (student, supervisor, defense) => {
+  const title = "Planification de votre Soutenance";
+  const dateFormatted = new Date(defense.date).toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  
+  const content = `
+    <p>Bonjour <span class="highlight">${student.prenom} ${student.nom}</span>,</p>
+    <p>Nous avons le plaisir de vous informer que votre date de soutenance a été fixée.</p>
+    <p><strong>Détails de la soutenance :</strong></p>
+    <ul>
+      <li><strong>Date :</strong> ${dateFormatted}</li>
+      <li><strong>Heure :</strong> ${defense.heure}</li>
+      <li><strong>Salle :</strong> ${defense.salle}</li>
+      <li><strong>Sujet :</strong> ${student.sujet}</li>
+      ${supervisor ? `<li><strong>Encadreur :</strong> ${supervisor.prenom} ${supervisor.nom}</li>` : ''}
+      ${defense.jury ? `<li><strong>Jury :</strong> ${defense.jury}</li>` : ''}
+    </ul>
+    <p>Merci de vous présenter 15 minutes avant l'heure indiquée avec votre présentation sur clé USB.</p>
+  `;
+
+  const emails = [student.email];
+  if (supervisor && supervisor.email) {
+    emails.push(supervisor.email);
+  }
+
+  return transporter.sendMail({
+    from: `"${process.env.SMTP_FROM_NAME}" <${process.env.SMTP_FROM_EMAIL}>`,
+    to: emails.join(','),
+    subject: `[SoutenancePro] Planification de soutenance - ${student.prenom} ${student.nom}`,
+    html: getHtmlTemplate(title, content, 'Voir le Planning', `${process.env.FRONTEND_URL}/dashboard.html#planning`),
+  });
+};
+
 module.exports = {
   sendStudentRegistrationEmail,
   sendSupervisorAssignmentEmail,
+  sendDefenseScheduledEmail,
 };
