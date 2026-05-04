@@ -66,7 +66,8 @@
 .auth-tabs {
   display: flex;
   margin-bottom: 24px;
-  background: #F1F5F9;
+  background: var(--navy-mid);
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 4px;
 }
@@ -82,11 +83,11 @@
   transition: var(--transition);
 }
 
-.auth-tab:hover { color: var(--color-primary); }
+.auth-tab:hover { color: var(--gold); }
 .auth-tab.active {
-  background: var(--ucad-white);
-  color: var(--color-primary);
-  box-shadow: var(--shadow-sm);
+  background: var(--gold);
+  color: var(--navy);
+  box-shadow: 0 4px 12px rgba(198,168,75,.3);
 }
 
 .login-card-header {
