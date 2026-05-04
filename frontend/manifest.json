@@ -1,0 +1,22 @@
+{
+  "name": "SoutenancePro - ESP-UCAD",
+  "short_name": "SoutenancePro",
+  "description": "Système de gestion des soutenances - ESP UCAD",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#041E42",
+  "theme_color": "#041E42",
+  "icons": [
+    {
+      "src": "img/LOGOREELUCAD.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "img/LOGOREELUCAD.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
